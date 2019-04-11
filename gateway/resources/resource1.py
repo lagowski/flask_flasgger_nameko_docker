@@ -1,8 +1,6 @@
 from flask_restful import Resource, fields, marshal_with, reqparse
 from nameko.standalone.rpc import ServiceRpcProxy, ClusterRpcProxy
 from dotenv import load_dotenv
-from nameko.rpc import RpcProxy
-from flasgger import swag_from
 import os
 
 text2say_fields = {
@@ -28,7 +26,6 @@ load_dotenv(dotenv_path="{}/.env_service2".format(current_dir))
 
 class Say(Resource):
 
-    # @swag_from('./resource1.yml')
     @marshal_with(text2say_fields)
     def get(self, text2say="No text"):
         '''
@@ -81,13 +78,3 @@ class Async(Resource):
             time_result = rpc.local_time_service.local()
             response = time_result.result()
         return {"time": "Action executed"}, 200 
-
-
-class TimePg(Resource):
-    
-    # @marshal_with(arrange_fields)
-    def get(self, timetext="Time Pg"):
-        with rpc_proxy('db_time_service') as rpc:
-            time = rpc.db()
-
-        return time
