@@ -1,7 +1,6 @@
 from flask import Flask, Blueprint, jsonify
 from flasgger import Swagger
 from flask_restful import Api, Resource
-
 from resources.resource1 import Say, Time
 
 
