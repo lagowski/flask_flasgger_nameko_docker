@@ -1,0 +1,51 @@
+version: '3.4'
+
+services:
+  gateway:
+    container_name: nameko.gateway
+    hostname: gateway
+    links:
+      - "rabbit:nameko-example-rabitmq"
+    ports:
+      - "8080:8080"
+    restart: always
+    networks:
+      - rabbit
+    build:
+      context: ./gateway
+      dockerfile: ./docker.run
+    #volumes:
+    #- ./api:/usr/src/app:ro
+    command: flask run --host=0.0.0.0 --port 8080
+ 
+  rabbit:
+    container_name: nameko-example-rabitmq
+    image: rabbitmq:3-management
+    restart: always
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_ERLANG_COOKIE:
+      RABBITMQ_DEFAULT_VHOST: /
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - rabbit  
+  
+  local_worker:
+    container_name:  nameko-example-test1
+    restart: always
+    depends_on:
+      - rabbit
+    links:
+      - rabbit:nameko-example-rabitmq
+    build:
+      context: ./workers/local_worker
+      dockerfile: ./docker.run
+    networks:
+      - rabbit  
+
+networks:
+  rabbit:
+  workers:
